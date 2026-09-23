@@ -1,162 +1,528 @@
-<div align="center">
-
 # VCME: Vibe Character Motion Editor
 
-**自然語言影片人物動作編輯系統**<br>
-Natural Language Video Character Motion Editing System
+> 自然語言影片人物動作編輯系統  
+> Natural Language Video Character Motion Editing System
 
-[影片成果](#video-results) · [方法與架構](#architecture) · [版本比較](#version-comparison) · [專題文件](#documents)
+VCME（Vibe Character Motion Editor）是一套以大型 AI 模型為基礎的互動式影片人物動作編輯系統。使用者可以在網頁中上傳影片、點選欲編輯的人物，並以自然語言輸入動作指令，系統會依序完成目標人物追蹤、遮罩生成、動作規劃、動作生成、背景補洞、結果合成與版本管理。
 
-</div>
+本專題重點不在重新訓練大型模型，而是設計一套可落地實作、可追溯、可版本管理的 AI 影片人物編輯流程與系統架構。
 
-VCME 探索以自然語言修改影片人物動作的工作流程，關注人物動作、外觀保留、背景修復與跨影格連續性。本專題以既有生成模型與處理工具整合實驗，並保存不同階段的輸出，讓動作生成與後續修復的結果可以被分別檢視。
+<!-- BEGIN ADDED RESULTS -->
+## Video Results｜影片成果與 VACE 比較
 
-本頁以 **V40：StoryMem + Wan2.2** 作為主要生成成果，搭配 **V57：V40 人物 + 外部光流背景修復** 進行視覺比較。下方並列原始影片、V40 與 V57，展示生成與背景修復兩個階段的成果。
+[主要成果](#main-result) · [VACE 與我們的影片比較](#vace-comparison) · [最新實驗流程](#current-workflow) · [原始系統設計](#system-architecture)
 
-<a id="video-results"></a>
-## Video Results｜影片成果
+本區新增目前的影片成果與實驗流程；後方原始 README 的架構圖片、系統設計、UML、API 規劃與團隊資訊完整保留。原始模型組合屬於先前設計，以下 V40／V57 說明對應目前展示的實驗版本。
 
-### Main Result · V40
+<a id="main-result"></a>
+### Main Result · 我們的主成果 V40
 
 <p align="center">
-  <a href="assets/videos/v40.mp4">
-    <img src="assets/previews/v40.gif" width="336" alt="VCME V40：StoryMem + Wan2.2 主成果動態預覽">
-  </a>
+  <a href="assets/videos/v40.mp4"><img src="assets/previews/v40.gif" width="336" alt="我們的 V40 主成果：StoryMem + Wan2.2 動態預覽"></a>
 </p>
-<p align="center"><strong>StoryMem + Wan2.2 · V40</strong><br><a href="assets/videos/v40.mp4">▶ 觀看完整 MP4</a></p>
+<p align="center"><strong>Ours · StoryMem + Wan2.2 · V40</strong><br><a href="assets/videos/v40.mp4">▶ 觀看完整影片</a></p>
 
-### Visual Comparison · 原片與各版本
+<a id="vace-comparison"></a>
+### Qualitative Comparison · 原片、VACE 與我們的成果
 
 <table>
   <thead>
     <tr>
       <th align="center">Input · 原始影片</th>
+      <th align="center">VACE · ContextBridge V31</th>
       <th align="center">Ours · V40</th>
       <th align="center">Ours · V57</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td align="center"><a href="assets/videos/input.mp4"><img src="assets/previews/input.gif" width="280" alt="原始影片動態預覽"></a></td>
-      <td align="center"><a href="assets/videos/v40.mp4"><img src="assets/previews/v40.gif" width="280" alt="V40 動態預覽"></a></td>
-      <td align="center"><a href="assets/videos/v57.mp4"><img src="assets/previews/v57.gif" width="280" alt="V57 外部光流背景修復動態預覽"></a></td>
+      <td align="center"><a href="assets/videos/input.mp4"><img src="assets/previews/input.gif" width="220" alt="原始影片動態預覽"></a></td>
+      <td align="center"><a href="assets/videos/vace-v31.mp4"><img src="assets/previews/vace-v31.gif" width="220" alt="VACE ContextBridge V31 動態預覽"></a></td>
+      <td align="center"><a href="assets/videos/v40.mp4"><img src="assets/previews/v40.gif" width="220" alt="我們的 V40 動態預覽"></a></td>
+      <td align="center"><a href="assets/videos/v57.mp4"><img src="assets/previews/v57.gif" width="220" alt="我們的 V57 背景修復動態預覽"></a></td>
     </tr>
     <tr>
-      <td align="center">原始輸入</td>
+      <td align="center">編輯前的輸入</td>
+      <td align="center">本地 VACE 對照版本</td>
       <td align="center">StoryMem + Wan2.2</td>
-      <td align="center">V40 人物 + 背景修復</td>
+      <td align="center">V40 人物 + 外部光流背景修復</td>
     </tr>
     <tr>
-      <td align="center"><a href="assets/videos/input.mp4">▶ 完整影片</a></td>
-      <td align="center"><a href="assets/videos/v40.mp4">▶ 完整影片</a></td>
-      <td align="center"><a href="assets/videos/v57.mp4">▶ 完整影片</a></td>
+      <td align="center"><a href="assets/videos/input.mp4">▶ 完整原片</a></td>
+      <td align="center"><a href="assets/videos/vace-v31.mp4">▶ VACE 完整影片</a></td>
+      <td align="center"><a href="assets/videos/v40.mp4">▶ V40 完整影片</a></td>
+      <td align="center"><a href="assets/videos/v57.mp4">▶ V57 完整影片</a></td>
     </tr>
   </tbody>
 </table>
 
-上方為循環播放的 GIF 動態預覽；點擊可開啟完整 MP4。預覽以相同寬度及 10 fps 製作，不改變影片速度。個別 GIF 的載入時間不同，不保證逐格同步；畫質、音訊與原始流暢度請以 MP4 為準。
+GIF 會循環播放，點擊可開啟完整 MP4。所有預覽統一以 10 fps、相同寬度製作，保留原播放速度；個別 GIF 不保證逐格同步，精細畫質與流暢度請以 MP4 為準。
 
-<a id="version-comparison"></a>
-## Version Comparison｜版本比較
-
-| 版本 | 方法與定位 | 比較重點 |
+| 比較版本 | 方法與定位 | 觀察重點 |
 | --- | --- | --- |
-| Input | 原始影片，作為外觀、背景與動作的參考 | 編輯前的角色與場景 |
-| V40 | StoryMem + Wan2.2；目前選定的主要生成成果 | 動作表現、人物外觀與時間連續性 |
-| V57 | 沿用 V40 人物，加入外部光流背景修復；非重新生成 | 背景穩定性、人物邊界與修復痕跡 |
+| Input | 原始影片 | 人物外觀、原始動作與場景 |
+| VACE · V31 | 本地 ContextBridge 對照版本 | 動作表現、外觀保留與背景變化 |
+| Ours · V40 | StoryMem + Wan2.2，主要生成成果 | 人物動作、身份與服裝保留、時間連續性 |
+| Ours · V57 | 沿用 V40 人物，加入外部光流背景修復，非重新生成 | 背景穩定性、人物邊界與修復痕跡 |
 
-V40 與 V57 分別代表生成結果及後續背景修復結果，應分開評估人物動作與背景品質。此頁提供定性比較；未附完整推論設定、編輯指令或量化指標，因此不列出未經評測的分數或優劣排名。
+VACE 欄使用本地 `PLAY_THIS_VACE_ContextBridge_v31.mp4` 的副本，不是官方示範片或官方 benchmark 成績；方法來源可參考 [VACE 官方專案](https://github.com/ali-vilab/VACE)。目前未附各版本完整 prompt、seed、遮罩與推論設定，此處為定性影片比較，不宣稱已在相同條件下優於 VACE。
 
-<a id="architecture"></a>
-## Method & Architecture｜方法與架構
+<a id="current-workflow"></a>
+### Current Workflow · 最新實驗流程補充
 
-### 成果生成與背景修復流程
-
-新版成果以 StoryMem + Wan2.2 的 V40 為主要展示版本，V57 則沿用 V40 人物進行外部光流背景修復。以下圖示呈現成果檔案所對應的處理階段與版本關係，不涵蓋尚未公開的模型接線與條件輸入細節。
+下圖呈現目前成果檔案可確認的版本關係：V40 為 StoryMem + Wan2.2 主成果，V57 則沿用 V40 人物進行背景修復。完整模型接線與條件輸入仍應以實作設定為準。
 
 ```mermaid
 flowchart LR
     Generation["StoryMem + Wan2.2"] --> V40["V40：主要生成成果"]
     V40 --> Repair["沿用 V40 人物<br/>外部光流背景修復"]
     Repair --> V57["V57：修復後成果<br/>非重新生成"]
-    Input["原始影片"] --> Compare["視覺比較"]
+    Input["原始影片"] --> Compare["定性影片比較"]
+    VACE["VACE ContextBridge V31"] --> Compare
     V40 --> Compare
     V57 --> Compare
 ```
 
-### 互動系統目標
-
-VCME 的產品目標是讓使用者上傳影片、選取人物並輸入動作指令，再預覽與管理生成版本。下圖為系統層級的設計目標，不表示本 repository 已提供可執行的完整前後端。
-
-```mermaid
-flowchart TD
-    User["使用者：影片、人物選取、動作指令"] --> UI["網頁操作介面"]
-    UI --> API["專案與任務管理"]
-    API --> Processing["影片生成與修復流程"]
-    Processing --> Storage["輸出影片與版本紀錄"]
-    Storage --> Review["預覽與比較"]
-    Review --> Decision["接受、退回或回復版本"]
-    Decision --> UI
-```
-
-### 與舊版設計的關係
-
-原始 README 以 SAM 2、VIRES-inspired parser、MotionEditor-inspired generation 與 ObjectMover-inspired composition 描述規劃流程。本頁以 V40／V57 的成果流程說明目前實驗；原始文件中的人物追蹤、指令解析與介面模組選型，保留作為歷史設計紀錄。
-
-<details>
-<summary><strong>舊版架構與 AI Pipeline 圖（歷史設計）</strong></summary>
-
-以下圖片保留自原始 repository，供追溯設計演變，並非新版實驗流程。
-
-![舊版 VCME 系統架構](docs/figures/system-architecture.jpg)
-
-![舊版 VCME AI Pipeline](docs/figures/ai-pipeline.jpg)
-
-[閱讀原始 README 存檔](docs/archive/README-original.md)
-
-</details>
-
-## Repository Structure｜資料夾結構
+### Demo Assets · 新增展示檔案
 
 ```text
-VCME-Vibe-Character-Motion-Editor/
-├── README.md
-├── assets/
-│   ├── videos/                 # README 完整影片：input、v40、v57
-│   └── previews/               # 對應的動態 GIF
-├── docs/
-│   ├── figures/                # 保留的舊版架構圖片
-│   └── archive/README-original.md
-├── 使用案例圖/
-├── 活動圖/
-├── 類別圖/
-└── *.pdf                       # 專題報告與設計文件
+assets/
+├── videos/
+│   ├── input.mp4
+│   ├── vace-v31.mp4
+│   ├── v40.mp4
+│   └── v57.mp4
+└── previews/
+    ├── input.gif
+    ├── vace-v31.gif
+    ├── v40.gif
+    └── v57.gif
 ```
 
-目前 repository 主要提供成果展示與系統設計文件，尚未包含可直接執行的完整前後端及生成 pipeline。
+上傳 GitHub 時請將 `README.md` 與 `assets/` 放在專案根目錄，並保留原有 `docs/`、報告與設計圖資料夾，讓圖片和影片連結能正常顯示。
 
-## Viewing Locally｜本地瀏覽
-
-```bash
-git clone https://github.com/B1229053/VCME-Vibe-Character-Motion-Editor.git
-cd VCME-Vibe-Character-Motion-Editor
-```
-
-使用支援 Markdown 圖片與 Mermaid 的工具預覽 README，或直接開啟 `assets/videos/` 內的 MP4。上傳時請保留此資料夾的相對路徑，將 `README.md`、`assets/`、`docs/`、專題 PDF 與三個設計圖資料夾放在 repository 根目錄；動態預覽、架構圖與文件連結會使用同一 repository 內的檔案。
-
-<a id="documents"></a>
-## Project Documents｜專題文件
-
-以下文件保留原始版本，內容可能包含舊版設計；目前成果與版本定位請以上方說明為準。
+### Available Documents · 現有專題文件
 
 - [第一次書面報告](VCME-第一次書面報告.pdf)
 - [第二次書面報告](VCME-第二次書面報告.pdf)
 - [完整系統分析與設計文件](VCME_自然語言影片人物動作編輯系統：完整系統分析與設計文件.pdf)
 - [VCME 詞彙表](VCME詞彙表.pdf)
-- [使用案例圖](使用案例圖/) · [活動圖](活動圖/) · [類別圖](類別圖/)
 
-## Team｜專題團隊
+原始 README 下方引用的 `VCME-signed(2).pdf` 未包含在目前 repository；原文連結保留，現有文件可從上方開啟。
 
-**指導教授：** 陳仁暉 教授
+---
 
-**專題成員：** 洪碩廷、顏羽婕、黃靖芳、彭暉紘、王俊傑
+<!-- END ADDED RESULTS -->
+
+![VCME System Architecture](docs/figures/system-architecture.jpg)
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [System Architecture](#system-architecture)
+- [AI Pipeline](#ai-pipeline)
+- [Version Management](#version-management)
+- [UML Class Design](#uml-class-design)
+- [Repository Structure](#repository-structure)
+- [Technology Stack](#technology-stack)
+- [Planned API Design](#planned-api-design)
+- [Getting Started](#getting-started)
+- [Project Scope](#project-scope)
+- [References](#references)
+- [Team Members](#team-members)
+
+## Project Overview
+
+傳統影片編輯需要大量人工操作，例如逐格遮罩、人物去背、動作重建、背景修補與多版本管理。VCME 希望將這些工作整理成一個自然語言驅動的互動流程：
+
+1. 使用者上傳影片。
+2. 使用者點選欲修改的人物。
+3. 使用者輸入自然語言指令。
+4. 系統解析指令並產生動作規劃。
+5. AI pipeline 生成修改後的影片。
+6. 使用者預覽、接受、退回或回復版本。
+
+範例指令：
+
+```text
+讓這個人站起來揮手
+讓人物往左走三步
+讓人物轉身後跳躍
+讓他站起來，並在空中轉身
+```
+
+## Key Features
+
+### Natural Language Editing
+
+使用者可以直接以文字描述想要修改的動作。系統會將自然語言轉換為結構化的動作需求，例如目標人物、動作類型、移動方向、時間範圍與生成限制。
+
+### Character Selection and Tracking
+
+使用者在影片中點選目標人物後，系統透過 SAM 2 進行影片物件分割與跨影格追蹤，產生人物遮罩序列，作為後續動作生成與背景合成的條件。
+
+### AI Motion Generation
+
+系統根據使用者指令與人物遮罩，結合 MotionEditor 類型的動作生成流程，嘗試保留人物身份、外觀、背景內容與時間一致性。
+
+### Inpainting and Composition
+
+當人物位置或姿態被修改後，原本人物所在位置可能留下背景缺口。系統透過 ObjectMover 類型的背景補洞與合成流程，產生最終影片結果。
+
+### Traceable Version Control
+
+每次生成都建立新版本，不直接覆蓋原始影片。使用者可以預覽結果、接受版本、退回結果，或回復到上一個已接受版本。
+
+## System Architecture
+
+VCME 採用前後端分離與背景任務排程架構。使用者端只負責瀏覽器操作，影片處理與 AI 生成任務則由後端與 GPU 推論服務負責。
+
+```mermaid
+flowchart LR
+    User[User / Web Browser] --> Frontend[Frontend UI]
+    Frontend --> Backend[Backend API Server]
+    Backend --> Scheduler[Task Scheduler]
+    Scheduler --> GPU[GPU AI Inference Service]
+    GPU --> Storage[Storage and Version Data]
+    Storage --> Backend
+    Backend --> Frontend
+```
+
+主要模組：
+
+| Module | Responsibility |
+| --- | --- |
+| Frontend | 影片上傳、人物點選、指令輸入、結果比較 |
+| Backend | API、專案管理、任務管理、版本管理 |
+| AI Pipeline | 人物追蹤、指令解析、動作生成、背景補洞與合成 |
+| Storage | 原始影片、遮罩資料、輸出影片、任務紀錄與版本資料 |
+
+## AI Pipeline
+
+![VCME AI Pipeline](docs/figures/ai-pipeline.jpg)
+
+VCME 的 AI pipeline 參考 SAM 2、VIRES、MotionEditor 與 ObjectMover 的研究概念，將自然語言影片人物動作編輯拆成四個主要階段。
+
+### Step 1: Character Tracking
+
+Model: SAM 2
+
+目的：
+
+- 影片人物分割
+- 跨影格目標追蹤
+- 產生人物遮罩序列
+
+輸入：
+
+- 原始影片 `V`
+- 使用者點選位置或框選範圍 `P`
+
+輸出：
+
+- 人物遮罩序列 `M`
+- 追蹤信心分數
+
+### Step 2: Instruction Parsing
+
+Model: VIRES-inspired parser
+
+目的：
+
+- 解析自然語言指令
+- 建立結構化動作需求
+- 產生 motion plan
+
+輸入：
+
+- 使用者文字指令 `T`
+- 人物遮罩序列 `M`
+
+輸出：
+
+- `ActionSpec`
+- `Action Embedding`
+- `Motion Plan`
+
+### Step 3: Motion Generation
+
+Model: MotionEditor-inspired generation
+
+目的：
+
+- 根據文字指令修改人物動作
+- 保留人物外觀與身份一致性
+- 維持影片時間連續性
+
+輸入：
+
+- 原始影片
+- 人物遮罩
+- 動作規劃
+
+輸出：
+
+- 編輯後人物影片片段
+
+### Step 4: Inpainting and Composition
+
+Model: ObjectMover-inspired composition
+
+目的：
+
+- 修補背景缺口
+- 合成生成後人物與背景
+- 輸出最終影片
+
+輸出：
+
+- Final Video
+- Version Metadata
+
+## Version Management
+
+VCME 將每次生成視為一個可追溯版本，避免直接覆蓋原始影片。
+
+```mermaid
+flowchart LR
+    V1[V1 Original] --> V2[V2 Edit A]
+    V2 --> V3[V3 Edit B]
+    V3 --> V4[V4 More Edits]
+    V2 -. rollback .-> V1
+    V3 -. reject .-> V2
+```
+
+版本欄位設計：
+
+| Field | Description |
+| --- | --- |
+| `version_id` | 版本編號 |
+| `parent_version_id` | 上一版本 |
+| `project_id` | 所屬專案 |
+| `prompt` | 使用者輸入的自然語言指令 |
+| `model_version` | 使用的模型或 pipeline 版本 |
+| `status` | `preview`, `accepted`, `rejected`, `failed` |
+| `video_url` | 輸出影片位置 |
+| `created_at` | 建立時間 |
+
+## UML Class Design
+
+核心物件包含 `Project`、`EditSession`、`ActionSpec`、`GenerationJob`、`MaskTrack` 與 `Version`。
+
+```mermaid
+classDiagram
+    class Project {
+        +id
+        +name
+        +createSession()
+        +listVersions()
+    }
+
+    class EditSession {
+        +id
+        +status
+        +submitPrompt()
+        +createJob()
+    }
+
+    class ActionSpec {
+        +actor
+        +action
+        +validate()
+        +toPlan()
+    }
+
+    class GenerationJob {
+        +id
+        +modelVersion
+        +run()
+        +retry()
+    }
+
+    class MaskTrack {
+        +frames
+        +confidence
+        +refine()
+        +interpolate()
+    }
+
+    class Version {
+        +id
+        +state
+        +accept()
+        +rollback()
+    }
+
+    Project "1" --> "*" EditSession
+    Project "1" --> "*" Version
+    EditSession "1" --> "1" ActionSpec
+    EditSession "1" --> "1" GenerationJob
+    GenerationJob "1" --> "1" MaskTrack
+    GenerationJob "1" --> "1" Version
+```
+
+## Repository Structure
+
+目前此資料夾收錄專題設計 PDF 與由 PDF 匯出的 README 圖片素材。後續若進入實作階段，建議擴充為以下結構：
+
+```text
+VCME
+├── frontend
+│   ├── pages
+│   ├── components
+│   └── assets
+├── backend
+│   ├── api
+│   ├── services
+│   ├── scheduler
+│   └── models
+├── ai
+│   ├── sam2
+│   ├── vires
+│   ├── motioneditor
+│   └── objectmover
+├── storage
+├── docs
+│   └── figures
+│       ├── ai-pipeline.jpg
+│       └── system-architecture.jpg
+├── VCME-signed(2).pdf
+└── README.md
+```
+
+## Technology Stack
+
+### Frontend
+
+- React
+- HTML5
+- CSS3
+- JavaScript
+
+### Backend
+
+- Python
+- FastAPI
+- Background task scheduler
+- RESTful API
+
+### AI Models
+
+| Model | Role |
+| --- | --- |
+| SAM 2 | 人物分割、影片物件追蹤、遮罩生成 |
+| VIRES | 指令解析、動作規劃 |
+| MotionEditor | 人物動作編輯與生成 |
+| ObjectMover | 背景補洞、結果合成 |
+
+### Storage
+
+- Original videos
+- Mask sequences
+- Generated videos
+- Job logs
+- Version metadata
+
+## Planned API Design
+
+以下為規劃中的 API 介面，實際路由可依後端實作調整。
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/projects` | 建立專案 |
+| `POST` | `/projects/{project_id}/videos` | 上傳原始影片 |
+| `POST` | `/projects/{project_id}/sessions` | 建立編輯工作階段 |
+| `POST` | `/sessions/{session_id}/select-character` | 送出人物點選位置 |
+| `POST` | `/sessions/{session_id}/prompt` | 送出自然語言指令 |
+| `POST` | `/jobs` | 建立 AI 生成任務 |
+| `GET` | `/jobs/{job_id}` | 查詢任務狀態 |
+| `GET` | `/projects/{project_id}/versions` | 取得版本列表 |
+| `POST` | `/versions/{version_id}/accept` | 接受版本 |
+| `POST` | `/versions/{version_id}/rollback` | 回復版本 |
+
+## Getting Started
+
+目前此 repository 仍以系統設計與專題文件為主，尚未包含可直接執行的前端、後端與 AI pipeline 程式碼。若後續補上完整專案，可使用以下方式啟動。
+
+### Clone Repository
+
+```bash
+git clone https://github.com/your-account/VCME.git
+cd VCME
+```
+
+### Backend
+
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+### Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+## Project Scope
+
+### Current Scope
+
+- 完成 VCME 系統架構設計
+- 完成 AI pipeline 流程設計
+- 完成核心物件與 UML class design
+- 完成版本管理與資料追溯設計
+- 完成專題簡報與 README 文件整理
+
+### MVP Scope
+
+- 支援單一角色編輯
+- 支援短影片片段
+- 支援人物點選與遮罩追蹤
+- 支援自然語言動作指令
+- 支援預覽、接受、退回與回復版本
+
+### Out of Scope
+
+- 不重新訓練大型 AI 模型
+- 不處理長影片完整剪輯工作流
+- 不保證多人物複雜互動場景的穩定生成
+- 不取代專業非線性剪輯軟體
+
+## Expected Results
+
+VCME 預期能展示一套完整的自然語言影片人物動作編輯流程：
+
+- 使用者能透過網頁介面完成影片上傳與人物選取。
+- 系統能將文字指令轉換為可執行的 AI 生成任務。
+- 生成結果能保留原人物外觀與影片背景一致性。
+- 每次結果都能被記錄為版本，並支援回復與追溯。
+
+## References
+
+- Ravi et al., **SAM 2: Segment Anything in Images and Videos**, arXiv:2408.00714, 2024.
+- Tu et al., **MotionEditor**, CVPR 2024.
+- Weng et al., **VIRES**, CVPR 2025.
+- Yu et al., **ObjectMover**, CVPR 2025.
+
+## Team Members
+
+指導教授：
+
+- 陳仁暉 教授
+
+專題成員：
+
+- 洪碩廷
+- 顏羽婕
+- 黃靖芳
+- 彭暉紘
+- 王俊傑
+
+## Project Document
+
+完整專題設計簡報請參考：
+
+- [`VCME-signed(2).pdf`](VCME-signed(2).pdf)
