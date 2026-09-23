@@ -1,0 +1,36 @@
+const {createRequire}=require('node:module'),fs=require('node:fs');
+const load=createRequire(process.argv[2]+'/package.json'),{chromium}=load('playwright');
+(async()=>{
+ const browser=await chromium.launch({channel:'msedge',headless:true});
+ const page=await browser.newPage({viewport:{width:1600,height:1000}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:7860',{waitUntil:'networkidle'});
+ if(await page.locator('#motion').inputValue())throw Error('Preset prompt remains');
+ if(await page.locator('#preset').count())throw Error('Preset menu remains');
+ if((await page.locator('body').innerText()).includes('V57'))throw Error('Experiment name visible');
+ await page.locator('#file').setInputFiles('media/7fca1a92980e446a9c240aae6893d694/source.mp4');
+ await page.waitForFunction(()=>document.querySelector('#video').videoWidth>0,null,{timeout:120000});
+ if(await page.locator('#motion').inputValue())throw Error('Upload inserted preset prompt');
+ await page.locator('#motion').fill('讓人物緩慢轉身，再向左走兩步。');
+ if(!await page.locator('#generate').isDisabled())throw Error('Generation enabled without selection');
+ const sourceURL=await page.locator('#video').getAttribute('src');
+ page.on('dialog',dialog=>dialog.accept());
+ await page.locator('.remove-media').click();
+ await page.waitForFunction(()=>document.querySelectorAll('.media-card').length===0);
+ if(!await page.locator('#emptyStage').isVisible())throw Error('Removed media still on stage');
+ const id=sourceURL.split('/')[2];
+ let catalog=await page.request.get('http://127.0.0.1:7860/api/media').then(r=>r.json());
+ if(catalog.some(m=>m.id===id))throw Error('Removed media remains in catalog');
+ await page.locator('#undoRemove').click();
+ await page.waitForFunction(()=>document.querySelectorAll('.media-card').length===1);
+ catalog=await page.request.get('http://127.0.0.1:7860/api/media').then(r=>r.json());
+ if(!catalog.some(m=>m.id===id))throw Error('Undo did not restore media');
+ await page.locator('.media-card').click();
+ if(await page.locator('#motion').inputValue())throw Error('Restored media brought an old default prompt');
+ await page.screenshot({path:'runtime/USER_EDITOR.png',fullPage:true});
+ if(errors.length)throw Error(errors.join('\n'));
+ const report={blank_prompt:true,user_prompt_editable:true,friendly_labels:true,remove:true,undo:true,no_generation_without_selection:true,test_media:id,jsErrors:errors};
+ fs.writeFileSync('runtime/USER_EDITOR_TEST.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+ await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
+

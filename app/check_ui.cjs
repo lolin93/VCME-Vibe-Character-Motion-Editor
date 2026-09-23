@@ -1,0 +1,27 @@
+const {createRequire}=require('node:module');
+const load=createRequire(process.argv[2]+'/package.json');
+const {chromium}=load('playwright');
+(async()=>{
+ const browser=await chromium.launch({channel:'msedge',headless:true});
+ const page=await browser.newPage({viewport:{width:1360,height:1000}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:7860',{waitUntil:'networkidle'});
+ await page.locator('#motion').waitFor({state:'attached'});
+ if(await page.locator('#mode option').count()!==3)throw Error('Missing modes');
+ await page.selectOption('#mode','generate');
+ await page.locator('#motion').waitFor({state:'visible'});
+ if(!(await page.locator('#motion').inputValue()).includes('greeting'))throw Error('Default prompt missing');
+ await page.locator('#point').click({position:{x:75,y:110}});
+ await page.selectOption('#mode','retime');
+ const range=await page.request.get('http://127.0.0.1:7860/assets/V58_Balanced.mp4',{headers:{Range:'bytes=0-99'}});
+ if(range.status()!==206||(await range.body()).length!==100)throw Error('Video seeking range failed');
+ const jobs=await page.request.get('http://127.0.0.1:7860/api/jobs').then(r=>r.json());
+ const done=jobs.filter(j=>j.state==='done');
+ if(done.length<2)throw Error('Expected retime and repair verification jobs');
+ await page.getByRole('button',{name:done[0].id.slice(0,8)+' · done',exact:true}).click();
+ await page.locator('#result').waitFor({state:'visible'});
+ await page.screenshot({path:'runtime/UI_PREVIEW.png',fullPage:true});
+ if(errors.length)throw Error(errors.join('\n'));
+ console.log(JSON.stringify({ui:'pass',modes:3,range:'pass',completedJobs:done.length,jsErrors:errors}));
+ await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
