@@ -18,7 +18,7 @@ VCME（Vibe Character Motion Editor）是一套以大型 AI 模型為基礎的�
 ### Main Result · 我們的主成果 V40
 
 <p align="center">
-  <a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4"><img src="assets/previews/v40.gif" width="336" alt="我們的 V40 主成果：StoryMem + Wan2.2 動態預覽"></a>
+  <a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4"><img src="assets/previews/ours-v40.gif" width="336" alt="我們的 V40 主成果：StoryMem + Wan2.2 動態預覽"></a>
 </p>
 <p align="center"><strong>Ours · StoryMem + Wan2.2 · V40</strong><br><a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4">▶ 觀看完整影片</a></p>
 
@@ -38,8 +38,8 @@ VCME（Vibe Character Motion Editor）是一套以大型 AI 模型為基礎的�
     <tr>
       <td align="center"><a href="videos/00_原始影片/00_原始影片.mp4"><img src="assets/previews/input.gif" width="220" alt="原始影片動態預覽"></a></td>
       <td align="center"><a href="videos/PLAY_THIS_VACE_ContextBridge_v31.mp4"><img src="assets/previews/vace-v31.gif" width="220" alt="VACE ContextBridge V31 動態預覽"></a></td>
-      <td align="center"><a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4"><img src="assets/previews/v40.gif" width="220" alt="我們的 V40 動態預覽"></a></td>
-      <td align="center"><a href="videos/03_外部修復研究/01_V57_V40人物加外部光流背景修復_非重新生成.mp4"><img src="assets/previews/v57.gif" width="220" alt="我們的 V57 背景修復動態預覽"></a></td>
+      <td align="center"><a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4"><img src="assets/previews/ours-v40.gif" width="220" alt="我們的 V40 動態預覽"></a></td>
+      <td align="center"><a href="videos/03_外部修復研究/01_V57_V40人物加外部光流背景修復_非重新生成.mp4"><img src="VCME_GitHub_上傳資料/assets/previews/v57.gif" width="220" alt="我們的 V57 背景修復動態預覽"></a></td>
     </tr>
     <tr>
       <td align="center">編輯前的輸入</td>
@@ -86,11 +86,12 @@ flowchart LR
 ### Demo Assets · 新增展示檔案
 
 ```text
-assets/previews/              # 首頁直接顯示的動態預覽
+assets/previews/              # 首頁動態預覽
 ├── input.gif
 ├── vace-v31.gif
-├── v40.gif
-└── v57.gif
+└── ours-v40.gif
+VCME_GitHub_上傳資料/assets/previews/
+└── v57.gif                   # 沿用目前已上傳的位置
 videos/                       # 完整影片沿用既有位置
 ├── 00_原始影片/00_原始影片.mp4
 ├── PLAY_THIS_VACE_ContextBridge_v31.mp4
@@ -98,7 +99,7 @@ videos/                       # 完整影片沿用既有位置
 └── 03_外部修復研究/01_V57_V40人物加外部光流背景修復_非重新生成.mp4
 ```
 
-上傳 GitHub 時請將 `Readme.md` 與 `assets/previews/` 放在專案根目錄，並保留既有 `videos/`、`docs/` 與其他資料夾。請直接上傳修正資料夾裡的內容，避免再包一層資料夾，造成首頁連結失效。
+本頁預覽沿用 repository 現有的檔名與位置。更新時只需替換根目錄的 `Readme.md`；請保留 `assets/previews/`、`VCME_GitHub_上傳資料/assets/previews/`、`videos/` 與 `docs/`。
 
 ### Available Documents · 現有專題文件
 
