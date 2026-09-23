@@ -18,9 +18,9 @@ VCME（Vibe Character Motion Editor）是一套以大型 AI 模型為基礎的�
 ### Main Result · 我們的主成果 V40
 
 <p align="center">
-  <a href="assets/videos/v40.mp4"><img src="assets/previews/v40.gif" width="336" alt="我們的 V40 主成果：StoryMem + Wan2.2 動態預覽"></a>
+  <a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4"><img src="assets/previews/v40.gif" width="336" alt="我們的 V40 主成果：StoryMem + Wan2.2 動態預覽"></a>
 </p>
-<p align="center"><strong>Ours · StoryMem + Wan2.2 · V40</strong><br><a href="assets/videos/v40.mp4">▶ 觀看完整影片</a></p>
+<p align="center"><strong>Ours · StoryMem + Wan2.2 · V40</strong><br><a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4">▶ 觀看完整影片</a></p>
 
 <a id="vace-comparison"></a>
 ### Qualitative Comparison · 原片、VACE 與我們的成果
@@ -36,10 +36,10 @@ VCME（Vibe Character Motion Editor）是一套以大型 AI 模型為基礎的�
   </thead>
   <tbody>
     <tr>
-      <td align="center"><a href="assets/videos/input.mp4"><img src="assets/previews/input.gif" width="220" alt="原始影片動態預覽"></a></td>
-      <td align="center"><a href="assets/videos/vace-v31.mp4"><img src="assets/previews/vace-v31.gif" width="220" alt="VACE ContextBridge V31 動態預覽"></a></td>
-      <td align="center"><a href="assets/videos/v40.mp4"><img src="assets/previews/v40.gif" width="220" alt="我們的 V40 動態預覽"></a></td>
-      <td align="center"><a href="assets/videos/v57.mp4"><img src="assets/previews/v57.gif" width="220" alt="我們的 V57 背景修復動態預覽"></a></td>
+      <td align="center"><a href="videos/00_原始影片/00_原始影片.mp4"><img src="assets/previews/input.gif" width="220" alt="原始影片動態預覽"></a></td>
+      <td align="center"><a href="videos/PLAY_THIS_VACE_ContextBridge_v31.mp4"><img src="assets/previews/vace-v31.gif" width="220" alt="VACE ContextBridge V31 動態預覽"></a></td>
+      <td align="center"><a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4"><img src="assets/previews/v40.gif" width="220" alt="我們的 V40 動態預覽"></a></td>
+      <td align="center"><a href="videos/03_外部修復研究/01_V57_V40人物加外部光流背景修復_非重新生成.mp4"><img src="assets/previews/v57.gif" width="220" alt="我們的 V57 背景修復動態預覽"></a></td>
     </tr>
     <tr>
       <td align="center">編輯前的輸入</td>
@@ -48,10 +48,10 @@ VCME（Vibe Character Motion Editor）是一套以大型 AI 模型為基礎的�
       <td align="center">V40 人物 + 外部光流背景修復</td>
     </tr>
     <tr>
-      <td align="center"><a href="assets/videos/input.mp4">▶ 完整原片</a></td>
-      <td align="center"><a href="assets/videos/vace-v31.mp4">▶ VACE 完整影片</a></td>
-      <td align="center"><a href="assets/videos/v40.mp4">▶ V40 完整影片</a></td>
-      <td align="center"><a href="assets/videos/v57.mp4">▶ V57 完整影片</a></td>
+      <td align="center"><a href="videos/00_原始影片/00_原始影片.mp4">▶ 完整原片</a></td>
+      <td align="center"><a href="videos/PLAY_THIS_VACE_ContextBridge_v31.mp4">▶ VACE 完整影片</a></td>
+      <td align="center"><a href="videos/01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4">▶ V40 完整影片</a></td>
+      <td align="center"><a href="videos/03_外部修復研究/01_V57_V40人物加外部光流背景修復_非重新生成.mp4">▶ V57 完整影片</a></td>
     </tr>
   </tbody>
 </table>
@@ -86,27 +86,26 @@ flowchart LR
 ### Demo Assets · 新增展示檔案
 
 ```text
-assets/
-├── videos/
-│   ├── input.mp4
-│   ├── vace-v31.mp4
-│   ├── v40.mp4
-│   └── v57.mp4
-└── previews/
-    ├── input.gif
-    ├── vace-v31.gif
-    ├── v40.gif
-    └── v57.gif
+assets/previews/              # 首頁直接顯示的動態預覽
+├── input.gif
+├── vace-v31.gif
+├── v40.gif
+└── v57.gif
+videos/                       # 完整影片沿用既有位置
+├── 00_原始影片/00_原始影片.mp4
+├── PLAY_THIS_VACE_ContextBridge_v31.mp4
+├── 01_主要成果/01_V40_StoryMem_Wan22_主成果_動作最佳基準.mp4
+└── 03_外部修復研究/01_V57_V40人物加外部光流背景修復_非重新生成.mp4
 ```
 
-上傳 GitHub 時請將 `README.md` 與 `assets/` 放在專案根目錄，並保留原有 `docs/`、報告與設計圖資料夾，讓圖片和影片連結能正常顯示。
+上傳 GitHub 時請將 `Readme.md` 與 `assets/previews/` 放在專案根目錄，並保留既有 `videos/`、`docs/` 與其他資料夾。請直接上傳修正資料夾裡的內容，避免再包一層資料夾，造成首頁連結失效。
 
 ### Available Documents · 現有專題文件
 
-- [第一次書面報告](VCME-第一次書面報告.pdf)
-- [第二次書面報告](VCME-第二次書面報告.pdf)
-- [完整系統分析與設計文件](VCME_自然語言影片人物動作編輯系統：完整系統分析與設計文件.pdf)
-- [VCME 詞彙表](VCME詞彙表.pdf)
+- [第一次書面報告](VCME_GitHub_上傳資料/VCME-第一次書面報告.pdf)
+- [第二次書面報告](VCME_GitHub_上傳資料/VCME-第二次書面報告.pdf)
+- [完整系統分析與設計文件](VCME_GitHub_上傳資料/VCME_自然語言影片人物動作編輯系統：完整系統分析與設計文件.pdf)
+- [VCME 詞彙表](VCME_GitHub_上傳資料/VCME詞彙表.pdf)
 
 原始 README 下方引用的 `VCME-signed(2).pdf` 未包含在目前 repository；原文連結保留，現有文件可從上方開啟。
 
